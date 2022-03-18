@@ -10,7 +10,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/othneildrew/Best-README-Template">
-    <img src="images/logo.svg" alt="Logo" width="200" height="200">
+    <img src="images/logo.svg" alt="Logo" width="400" height="400">
   </a>
   <h3 align="center">Lexer Analyzer</h3>
   <p align="center">Compilers project Part 1</p>
