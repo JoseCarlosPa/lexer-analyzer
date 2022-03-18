@@ -30,6 +30,9 @@
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/images" />
     </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/test_cases/outputs" />
+    </key>
   </component>
   <component name="RunManager">
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
@@ -69,7 +72,7 @@
       <option name="presentableId" value="Default" />
       <updated>1647536636997</updated>
       <workItem from="1647536642465" duration="1144000" />
-      <workItem from="1647564247326" duration="3178000" />
+      <workItem from="1647564247326" duration="3535000" />
     </task>
     <task id="LOCAL-00001" summary="feat(readme&amp;licence): addition of README.md and LICENCE.md and modified setup.sh">
       <created>1647577449820</created>
@@ -122,6 +125,6 @@
     <option name="LAST_COMMIT_MESSAGE" value="feat(ignore): addition of .ignore" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/lexer_analyzer$main.coverage" NAME="main Coverage Results" MODIFIED="1647579198603" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/lexer_analyzer$main.coverage" NAME="main Coverage Results" MODIFIED="1647579752378" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
