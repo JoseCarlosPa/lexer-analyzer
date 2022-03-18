@@ -1,34 +1,16 @@
-"""
----------------------------------------------------------------------------------------------------------
-*
-*       Jose Carlos Pacheco Sanchez - A01702828
-*       Compiladores - Feb-Jun 2022 - Qro
-*       Name: Analizador Lexico
-*       Based on: https://github.com/Manchas2k4/compilers/tree/master/examples/lexical_analyzer
-*
----------------------------------------------------------------------------------------------------------
-"""
-from functions import *
-import os
+# This is a sample Python script.
+
+# Press ⌃R to execute it or replace it with your code.
+# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 
 
-while True:
-    menu()
-    try:
-        select = int(input('¿Que deseas hacer?:'))
+def print_hi(name):
+    # Use a breakpoint in the code line below to debug your script.
+    print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
 
-        if select == 1:
-            read_process()
 
-        if select == 2:
-            os.chdir('./test_cases')
-            os.system('ls')
-            print(Color.OKBLUE + "Selecciona un test:" + Color.ENDC)
-            read_process()
-            os.chdir('..')
+# Press the green button in the gutter to run the script.
+if __name__ == '__main__':
+    print_hi('PyCharm')
 
-        if select == 3:
-            exit()
-
-    except ValueError:
-        print(Color.WARNING + "Creo ingresaste algo que no es un numero, vuelve a intentar" + Color.ENDC)
+# See PyCharm help at https://www.jetbrains.com/help/pycharm/

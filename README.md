@@ -69,24 +69,34 @@ chmod 777 setup.sh
   </ol>
 - En la primera opción correspondiente al número "1" podras leer el contenido de un archivo especificando su nombre o el path del archivo incluyendo su extension (.txt), veras una pantalla parecida a esta:
 <div align="center">
-    <img src="images/screenshot-2.png" alt="Logo" width="40%" height="40%">
     [Pantalla de menu para ingresar nombre de archivo]
 </div>
 <div align="center">
-    <img src="images/screenshot-3.png" alt="Logo" width="40%" height="40%">
+    <img src="images/screenshot-2.png" alt="Logo" width="40%" height="40%">
+</div>
+
+<div align="center">
     [Pantalla con el resultado del analizador lexico en consola ]
+</div>
+<div align="center">
+    <img src="images/screenshot-3.png" alt="Logo" width="40%" height="40%">
 </div>
 
 >Nota: Si se desea puedes copiar y pegar tu archivo al mismo nivel que el archivo main.py para solo escribir el nombre del archivo
 - En la opcion correspondiente al número "2" puedes utilizar los test cases que se proporcionan y en este caso solo será necesario escribir el nombre del archivo con su extension (.txt)
 <div align="center">
-    <img src="images/screenshot-4.png" alt="Logo" width="40%" height="40%">
     [Pantalla del menu con la lista de inputID.txt ]
+
 </div>
 <div align="center">
-    <img src="images/screenshot-5.png" alt="Logo" width="40%" height="40%">
-    [Pantalla del resultado del analizador lexico en consola ]
+    <img src="images/screenshot-4.png" alt="Logo" width="40%" height="40%">
 </div>
+
+<div align="center">
+    <img src="images/screenshot-5.png" alt="Logo" width="40%" height="40%">
+</div>
+    [Pantalla del resultado del analizador lexico en consola ]
+
 
 >Nota: Si se desea puedes copiar y pegar tus archivos en la carpeta "test_cases" y escribir el nombre con su extension (.txt)
 
