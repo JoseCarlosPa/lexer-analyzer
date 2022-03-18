@@ -12,14 +12,31 @@ def menu():
     print('3.- Salir')
 
 
-def is_array(word, array):
-    already = True if word in array else False
-    return already
+def is_array(str, array):
+    return True if str in array else False
 
 
-def rm_from_terminals(word, array):
-    if word in array:
-        array.remove(word)
+def read_line(line, term, no_term):
+    stack = []
+    right = False
+    for str in line.split():
+        stack.append(str)
+        if str == '->':
+            right = True
+            stack.pop()
+            new_non_terminal = stack.pop()
+            if not is_array(new_non_terminal, no_term):
+                no_term.append(new_non_terminal)
+            term = rm_from_terminals(new_non_terminal, term)
+        elif right and str != "'":
+            if not is_array(str, no_term) and not is_array(str, term):
+                term.append(str)
+    return term, no_term
+
+
+def rm_from_terminals(str, array):
+    if str in array:
+        array.remove(str)
     return array
 
 
@@ -28,24 +45,6 @@ def output_array(array, terminal):
     for sym in array:
         string += sym + ', '
     print(string)
-
-
-def lineRead(line, t, nt):
-    stack = []
-    right = False
-    for word in line.split():
-        stack.append(word)
-        if word == '->':
-            right = True
-            stack.pop()
-            new_non_terminal = stack.pop()
-            if not is_array(new_non_terminal, nt):
-                nt.append(new_non_terminal)
-            t = rm_from_terminals(new_non_terminal, t)
-        elif right and word != "'":
-            if not is_array(word, nt) and not is_array(word, t):
-                t.append(word)
-    return t, nt
 
 
 def read_process():
@@ -59,9 +58,9 @@ def read_process():
         Terminals = []
         NonTerminals = []
 
-        for i in range(nProductions):
+        for _ in range(nProductions):
             line = file.readline()
-            t, nt = lineRead(line, Terminals, NonTerminals)
+            read_line(line, Terminals, NonTerminals)
 
         print('\n')
         output_array(Terminals, True)
