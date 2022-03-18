@@ -14,6 +14,7 @@
   </a>
   <h3 align="center">Lexer Analyzer</h3>
   <p align="center">Compilers project Part 1</p>
+<p>Jose Carlos Pacheco Sanchez - A01702828</p>
 </div>
 
 
