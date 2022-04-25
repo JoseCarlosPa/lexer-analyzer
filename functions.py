@@ -7,8 +7,8 @@ class Color:
 
 def menu():
     print('-----Menu-----:')
-    print('1.- Seleccionar una archivo:')
-    print('2.- Usar pruebas de "test_cases":')
+    print('1.- LEXER')
+    print('2.- FIRST & AFOLLOWS')
     print('3.- Salir')
 
 
@@ -74,4 +74,5 @@ def read_process():
         print("Could not convert data to an integer.")
     except BaseException as err:
         print(f"Unexpected {err=}, {type(err)=}")
+
 
