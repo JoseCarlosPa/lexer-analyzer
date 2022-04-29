@@ -3,189 +3,144 @@
 *
 *       Jose Carlos Pacheco Sanchez - A01702828
 *       Compiladores - Feb-Jun 2022 - Qro
-*       Name: Analizador Lexico
+*       Name: Generador de is_first & is_follows
 *       Based on: https://github.com/Manchas2k4/compilers/tree/master/examples/lexical_analyzer
+*       File: main program file
 *
 ---------------------------------------------------------------------------------------------------------
 """
 from functions import *
 import os
 
-
-# Check if the non terminal key is already in dictionary, if not returns a new entry with the key on it
-def isAlreadyKey(dictionaries, key):
-    empty = {
-        "ruleKey": key,
-        "rules": [],
-        "FIRST": [],
-        "FOLLOW": [],
-        "ntFIRSTS": [],
-        "hasEpsilon": False
-    }
-    for dic in dictionaries:
-        if dic["ruleKey"] == key:
-            return dic
-    dictionaries.append(empty)
-    return empty
-
-
-#
-def getValueForKey(rules, key, value):
-    for rule in rules:
-        if rule["ruleKey"] == key:
-            return rule[str(value)]
-
-# Check for the first rule of epsilon  X -> a, a is a terminal
-def firstCase(line, terminals, nonTerminals, rules, index):
-    line = line.split()
-    rule = isAlreadyKey(rules, line[0])
-    del line[:2]
-    first = True
-    body = {
-        "index": index,
-        "rule": line,
-    }
-    rule["rules"].append(body)
-    for element in line:
-        if element != '->':
-            if (first):
-                if is_array(element, terminals):
-                    if not is_array(element, rule["FIRST"]):
-                        rule["FIRST"].append(element)
-                        return rule
-                else:
-                    if not is_array(element, rule["FIRST"]):
-                        rule["FIRST"].append(element)
-                        return rule
-            elif element == "'":
-                rule["hasEpsilon"] = True
-            else:
-                if not is_array(element, rule["ntFIRSTS"]):
-                    rule["ntFIRSTS"].append(element)
-            first = False
-
-    return rule
-
-
-# Check for the first of nt symbols
-def firstNTR(nt, rules):
-    for rule in rules:
-        if rule["ruleKey"] == nt:
-            if len(rule["FIRST"]) > 0:
-                return rule["FIRST"]
-            elif len(rule["ntFIRSTS"]) > 0:
-                for ntF in rule["ntFIRSTS"]:
-                    return firstNTR(ntF, rules)
-
-
-def firstCase2(line, rules):
-    hasEpsilon = True
-    for rule in rules:
-        if len(rule["FIRST"]) > 0:
-            for t in rule["FIRST"]:
-                if not is_array(t, Terminals):
-                    rule['FIRST'] = list(set(rule['FIRST']) | set(firstNTR(t, rules)))
-                    rule['FIRST'].remove(t)
-        if len(rule["FIRST"]) <= 0:
-            for nt in rule["ntFIRSTS"]:
-                if (hasEpsilon):
-                    rule['FIRST'] = list(set(rule['FIRST']) | set(firstNTR(nt, rules)))
-                    hasEpsilon = getValueForKey(rules, nt, "hasEpsilon")
-                else:
-                    return
-
-def getFirstOf(rules, element):
-    if is_array(element, Terminals):
+# Get the first of the line
+def get_first(actions, element):
+    if is_array(element, terminals):
         return element
     elif element == "'":
         return []
     else:
-        return getValueForKey(rules, element, "FIRST")
+        return get_key_value(actions, element, "is_first")
 
-def follow(rule, rules):
-    ruleKey = rule["ruleKey"]
-    for allRule in rules:
+# Set if if contains an epislon to apply second rule of LL1
+def is_first_contains_epsilon(actions):
+    contains_epsilon = True
+    for action in actions:
+        if len(action["is_first"]) > 0:
+            for t in action["is_first"]:
+                if not is_array(t, terminals):
+                    action['is_first'] = list(set(action['is_first']) | set(not_terminal_is_first(t, actions)))
+                    action['is_first'].remove(t)
+        if len(action["is_first"]) <= 0:
+            for not_terminal in action["not_first"]:
+                if contains_epsilon:
+                    action['is_first'] = list(set(action['is_first']) | set(not_terminal_is_first(not_terminal, actions)))
+                    contains_epsilon = get_key_value(actions, not_terminal, "contains_epsilon")
+                else:
+                    return
+
+# Define with recursion the follow of a non terminal
+def is_follow(action, actions):
+    rule_key = action["rule_key"]
+    for allRule in actions:
         for nRule in allRule["rules"]:
-            if is_array(ruleKey, nRule["rule"]):
-                index = nRule["rule"].index(ruleKey) + 1
+            if is_array(rule_key, nRule["rule"]):
+                index = nRule["rule"].index(rule_key) + 1
                 if index == len(nRule["rule"]) :
-                    follow = allRule["FOLLOW"]
-                    rule["FOLLOW"] = list(set(rule['FOLLOW']) | set(follow))
+                    is_follow = allRule["is_follow"]
+                    action["is_follow"] = list(set(action['is_follow']) | set(is_follow))
                 elif index < len(nRule["rule"]) :
-                    firstNext = getFirstOf(rules, nRule["rule"][index])
-                    if is_array("€", firstNext):
-                        follow = list(set(rule['FOLLOW']) | set(firstNext))
-                        firstNext =  list(set(allRule["FOLLOW"]) | set(follow))
-                        rule["FOLLOW"] = firstNext
-                        if '€' in rule["FOLLOW"]: rule["FOLLOW"].remove('€')
+                    is_firstNext = get_first(actions, nRule["rule"][index])
+                    if is_array("€", is_firstNext):
+                        is_follow = list(set(action['is_follow']) | set(is_firstNext))
+                        is_firstNext =  list(set(allRule["is_follow"]) | set(is_follow))
+                        action["is_follow"] = is_firstNext
+                        if '€' in action["is_follow"]: action["is_follow"].remove('€')
                     else:
-                        rule["FOLLOW"] = list(set(rule['FOLLOW']) | set(firstNext))
-                        if '€' in rule["FOLLOW"]: rule["FOLLOW"].remove('€')
+                        action["is_follow"] = list(set(action['is_follow']) | set(is_firstNext))
+                        if '€' in action["is_follow"]: action["is_follow"].remove('€')
+            return
 
+
+# Main function and menu options
 while True:
     menu()
     try:
         select = int(input('¿Que deseas hacer?:'))
 
+        # Lexer analyzer
         if select == 1:
             read_process()
 
+        # First And Follows
         if select == 2:
-            filename = input("Ingresa el nombre del archivo:\n")
-            f = open(filename, "r")
-            nProductions = int(f.readline())
+            try:
+                filename = input("Ingresa el nombre del archivo:\n")
+                file = open(filename, "r")
+                number_of_productions = int(file.readline())
 
-            Terminals = []
-            NonTerminals = []
+                terminals = []
+                non_terminals = []
+                is_ll_1 = True
 
-            for i in range(nProductions):
-                line = f.readline()
-                read_line(line, Terminals, NonTerminals)
+                for i in range(number_of_productions):
+                    content = file.readline()
+                    read_line(content, terminals, non_terminals)
 
-            print("\n-------------------------")
-            output_array(Terminals, True)
-            output_array(NonTerminals, False)
-            print("-------------------------\n")
+                print("\n----------LEXER---------------")
+                output_array(terminals, True)
+                output_array(non_terminals, False)
+                print("------------------------------\n")
 
-            f.seek(0)
-            line = f.readline()
-            rules = []
-            for i in range(nProductions):
-                line = f.readline()
-                firstCase(line, Terminals, NonTerminals, rules, i)
+                file.seek(0)
+                content = file.readline()
+                actions = []
 
-            f.seek(0)
-            line = f.readline()
-            for i in range(nProductions):
-                line = f.readline()
-                firstCase2(line, rules)
+                for i in range(number_of_productions):
+                    content = file.readline()
+                    is_first_case( i,content, terminals, actions)
 
-            rules[0]["FOLLOW"].append('$')
-            for rule in rules:
-                follow(rule, rules)
+                file.seek(0)
+                content = file.readline()
 
-            for rule in rules:
-                print(str(rule["ruleKey"]) + " => FIRST = {" + str(sorted(rule["FIRST"]))[1:-1] + "} , FOLLOW = {" + str(rule["FOLLOW"])[1:-1] + "}")
+                for i in range(number_of_productions):
+                    content = file.readline()
+                    is_first_contains_epsilon(actions)
 
-                print("\n")
+                actions[0]["is_follow"].append('$')
 
-            f.close()
+                for action in actions:
+                    is_follow(action, actions)
 
-            isLL1 = True
-            for rule in rules:
-                if (rule["hasEpsilon"]):
-                    isLL1 = False
-                    break
-                for nt in rule["ntFIRSTS"]:
-                    if (getValueForKey(rules, nt, "hasEpsilon")):
-                        isLL1 = False
+                for action in actions:
+                    print(str(action["rule_key"]) + " => FIRST = {" + str(sorted(action["is_first"]))[1:-1] + "} , FOLLOW = {" + str(action["is_follow"])[1:-1] + "}")
+                    print("\n")
+
+                file.close()
+
+                for action in actions:
+                    if action["contains_epsilon"]:
+                        is_ll_1 = False
                         break
-            if (isLL1):
-                print("\nLL(1) YES")
-            else:
-                print("\nLL(1) NO")
+                    for nt in action["not_first"]:
+                        if get_key_value(actions, nt, "contains_epsilon"):
+                            is_ll_1 = False
+                            break
 
+                if is_ll_1:
+                    print("\nLL(1) YES")
+                else:
+                    print("\nLL(1) NO")
 
+            except OSError as err:
+                print(Color.FAIL + "!!Mmm creo no existe ese archivo o directorio, vuelve a intentar: {0}".format(
+                    err) + Color.ENDC)
+
+            except ValueError:
+                print("Could not convert data to an integer.")
+            except BaseException as err:
+                print(f"Unexpected {err=}, {type(err)=}")
+
+        # Finish the program
         if select == 3:
             exit()
 

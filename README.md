@@ -12,8 +12,8 @@
   <a href="https://github.com/othneildrew/Best-README-Template">
     <img src="images/logo.svg" alt="Logo" width="350" height="350">
   </a>
-  <h3 align="center">Lexer Analyzer</h3>
-  <p align="center">Proyecto de Compiladores Parte 1</p>
+  <h3 align="center">First and Follow</h3>
+  <p align="center">Proyecto de Compiladores Parte 2</p>
 <p>Jose Carlos Pacheco Sanchez - A01702828</p>
 </div>
 
@@ -61,13 +61,13 @@ chmod 777 setup.sh
 
 ### Usándolo
 
-- El menu consta de 3 secciones y podran ser elegidos unicamente con los numeros 1,2 o 3:
+- El menu consta de 2 secciones y podran ser elegidos unicamente con los numeros 1,2 o 3:
   <ol>
-    <li>Seleccionar un archivo</li>
-    <li>Correr pruebas de "test_cases"</li>
+    <li>Lexer</li>
+    <li>First & Follows</li>
     <li>Salir</li>
   </ol>
-- En la primera opción correspondiente al número "1" podras leer el contenido de un archivo especificando su nombre o el path del archivo incluyendo su extension (.txt), veras una pantalla parecida a esta:
+- En la primera opción correspondiente al número "1" podras obtener un analisis lexico al leer el contenido de un archivo especificando su nombre o el path del archivo incluyendo su extension (.txt), veras una pantalla parecida a esta:
 <div align="center">
     [Pantalla de menu para ingresar nombre de archivo]
 </div>
@@ -83,9 +83,9 @@ chmod 777 setup.sh
 </div>
 
 >Nota: Si se desea puedes copiar y pegar tu archivo al mismo nivel que el archivo main.py para solo escribir el nombre del archivo
-- En la opcion correspondiente al número "2" puedes utilizar los test cases que se proporcionan y en este caso solo será necesario escribir el nombre del archivo con su extension (.txt)
+- En la opcion correspondiente al número "2" podras obtener los First y Follows de un archivo de la misma forma deberas ingresar nombre o path del archivo con su extension (.txt)
 <div align="center">
-    [Pantalla del menu con la lista de inputID.txt ]
+    [Pantalla del menu para ingresar nombre de archivo]
 
 </div>
 <div align="center">
@@ -95,10 +95,10 @@ chmod 777 setup.sh
 <div align="center">
     <img src="images/screenshot-5.png" alt="Logo" width="40%" height="40%">
 </div>
-    [Pantalla del resultado del analizador lexico en consola ]
+    [Pantalla del resultado de first y follows en consola ]
 
 
->Nota: Si se desea puedes copiar y pegar tus archivos en la carpeta "test_cases" y escribir el nombre con su extension (.txt)
+>Nota: Si se desea puedes copiar y pegar tu archivo al mismo nivel que el archivo main.py para solo escribir el nombre del archivo
 
 
 <!-- MARKDOWN LINKS & IMAGES -->
