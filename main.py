@@ -5,144 +5,209 @@
 *       Compiladores - Feb-Jun 2022 - Qro
 *       Name: Generador de is_first & is_follows
 *       Based on: https://github.com/Manchas2k4/compilers/tree/master/examples/lexical_analyzer
-*       File: main program file
+*       File: Main component part 3
 *
 ---------------------------------------------------------------------------------------------------------
 """
+
 from functions import *
-import os
 
-# Get the first of the line
-def get_first(actions, element):
-    if is_array(element, terminals):
-        return element
-    elif element == "'":
-        return []
-    else:
-        return get_key_value(actions, element, "is_first")
 
-# Set if if contains an epislon to apply second rule of LL1
-def is_first_contains_epsilon(actions):
-    contains_epsilon = True
-    for action in actions:
-        if len(action["is_first"]) > 0:
-            for t in action["is_first"]:
-                if not is_array(t, terminals):
-                    action['is_first'] = list(set(action['is_first']) | set(not_terminal_is_first(t, actions)))
-                    action['is_first'].remove(t)
-        if len(action["is_first"]) <= 0:
-            for not_terminal in action["not_first"]:
-                if contains_epsilon:
-                    action['is_first'] = list(set(action['is_first']) | set(not_terminal_is_first(not_terminal, actions)))
-                    contains_epsilon = get_key_value(actions, not_terminal, "contains_epsilon")
-                else:
-                    return
-
-# Define with recursion the follow of a non terminal
-def is_follow(action, actions):
-    rule_key = action["rule_key"]
-    for allRule in actions:
-        for nRule in allRule["rules"]:
-            if is_array(rule_key, nRule["rule"]):
-                index = nRule["rule"].index(rule_key) + 1
-                if index == len(nRule["rule"]) :
-                    is_follow = allRule["is_follow"]
-                    action["is_follow"] = list(set(action['is_follow']) | set(is_follow))
-                elif index < len(nRule["rule"]) :
-                    is_firstNext = get_first(actions, nRule["rule"][index])
-                    if is_array("€", is_firstNext):
-                        is_follow = list(set(action['is_follow']) | set(is_firstNext))
-                        is_firstNext =  list(set(allRule["is_follow"]) | set(is_follow))
-                        action["is_follow"] = is_firstNext
-                        if '€' in action["is_follow"]: action["is_follow"].remove('€')
+def firstCase2(line, rules):
+    hasEpsilon = True
+    for rule in rules:
+        if(len(rule["FIRST"]) > 0):
+            for t in rule["FIRST"]:
+                    if(not isIn(t, Terminals) and t != '€'):
+                        rule['FIRST'] = list(set(rule['FIRST']) | set(firstNTR(t, rules)))
+                        rule['FIRST'].remove(t)
+        if(len(rule["FIRST"]) <= 0):
+            for nt in rule["ntFIRSTS"]:
+                    if(hasEpsilon):
+                        rule['FIRST'] = list(set(rule['FIRST']) | set(firstNTR(nt, rules)))
+                        hasEpsilon = getValueForKey(rules, nt, "hasEpsilon")
                     else:
-                        action["is_follow"] = list(set(action['is_follow']) | set(is_firstNext))
-                        if '€' in action["is_follow"]: action["is_follow"].remove('€')
-            return
+                         return
 
 
-# Main function and menu options
-while True:
-    menu()
-    try:
-        select = int(input('¿Que deseas hacer?:'))
 
-        # Lexer analyzer
-        if select == 1:
-            read_process()
+def follow(rule, rules):
+    ruleKey = rule["ruleKey"]
+    for allRule in rules:
+        for nRule in allRule["rules"]:
+            if isIn(ruleKey, nRule["rule"]):
+                index = nRule["rule"].index(ruleKey) + 1
+                if index == len(nRule["rule"]) :
+                    follow = allRule["FOLLOW"]
+                    rule["FOLLOW"] = list(set(rule['FOLLOW']) | set(follow))
+                elif index < len(nRule["rule"]) :
+                    firstNext = getFirstOf(rules, nRule["rule"][index],Terminals)
+                    if isIn("€", firstNext):
+                        follow = list(set(rule['FOLLOW']) | set(firstNext))
+                        firstNext =  list(set(allRule["FOLLOW"]) | set(follow))
+                        rule["FOLLOW"] = firstNext
+                        if '€' in rule["FOLLOW"]: rule["FOLLOW"].remove('€')
+                    else:
+                        rule["FOLLOW"] = list(set(rule['FOLLOW']) | set(firstNext))
+                        if '€' in rule["FOLLOW"]: rule["FOLLOW"].remove('€')
 
-        # First And Follows
-        if select == 2:
-            try:
-                filename = input("Ingresa el nombre del archivo:\n")
-                file = open(filename, "r")
-                number_of_productions = int(file.readline())
+def gramaticaLL1(rule, rules):
+    firsts = []
+    for r in rule["rules"]:
+        first = r["rule"][0]
+        rfirsts = []
+        rfirsts = getFirstOf(rules, first,Terminals)
+        for e in rfirsts:
+            if (not isIn(e, firsts)):
+                firsts.append(e)
+            else:
+                return False
+    return True
 
-                terminals = []
-                non_terminals = []
-                is_ll_1 = True
+def table(r, rules):
+    row = {
+        "rule": [],
+        "nt": [],
+        "t": []
+    }
+    for first in r["FIRST"]:
+        notFound = True
+        for keyRule in r["rules"]:
+            for charInKeyRule in keyRule["rule"]:
+                if charInKeyRule == first:
+                    row['nt'].append(r["ruleKey"]) # r is the original ruleKey
+                    row['t'].append(first) # is part of the firsts of r
+                    ntAppend = r["ruleKey"] +' -> '+''.join(keyRule["rule"])
+                    row['rule'].append(ntAppend)
+                    notFound = False
+        #the first is not contained directly in the rules of the the key r
+        if notFound:
+            for keyRule in r["rules"]:
+                for charInKeyRule in keyRule["rule"]:
+                    if(isIn(charInKeyRule, NonTerminals)):
+                        for rule in rules:
+                            if rule["ruleKey"] == charInKeyRule:
+                                for nonTerminalRules in rule["rules"]:
+                                    for charInRule in nonTerminalRules["rule"]:
+                                        if charInRule == first:
+                                            row['nt'].append(r["ruleKey"])
+                                            row['t'].append(first)
+                                            ntAppend = r["ruleKey"] +' -> '+''.join(keyRule["rule"])
+                                            row['rule'].append(ntAppend)
+                                            notFound = False
+        if notFound:
+            for keyRule in r["rules"]:
+                for charInKeyRule in keyRule["rule"]:
+                    if(isIn(charInKeyRule, NonTerminals)):
+                        for nonTerminal in rules:
+                            if(nonTerminal["ruleKey"] == charInKeyRule):
+                                for nonTerminalRules in nonTerminal["rules"]:
+                                    for ruleInNonTerminal in nonTerminalRules["rule"]:
+                                        if(isIn(ruleInNonTerminal, NonTerminals)):
+                                            for NT in rules:
+                                                if NT["ruleKey"] == ruleInNonTerminal:
+                                                    for NTRules in NT["rules"]:
+                                                        for NTRule in NTRules["rule"]:
+                                                            if NTRule == first:
+                                                                row['nt'].append(r["ruleKey"])
+                                                                row['t'].append(first)
+                                                                ntAppend = r["ruleKey"] +' -> '+''.join(keyRule["rule"])
+                                                                row['rule'].append(ntAppend)
+                                                                notFound = False
+    return row
 
-                for i in range(number_of_productions):
-                    content = file.readline()
-                    read_line(content, terminals, non_terminals)
 
-                print("\n----------LEXER---------------")
-                output_array(terminals, True)
-                output_array(non_terminals, False)
-                print("------------------------------\n")
 
-                file.seek(0)
-                content = file.readline()
-                actions = []
+exit = False
+while exit == False:
+    # Reading the name of the file
+    filename = input("Enter file name\n")
 
-                for i in range(number_of_productions):
-                    content = file.readline()
-                    is_first_case( i,content, terminals, actions)
+    f = open(filename, "r")
 
-                file.seek(0)
-                content = file.readline()
+    n = f.readline().split()
+    nProductions = int(n[0])
 
-                for i in range(number_of_productions):
-                    content = file.readline()
-                    is_first_contains_epsilon(actions)
+    nCadenas = int(n[1])
 
-                actions[0]["is_follow"].append('$')
+    print("nProductions", nProductions)
+    
+    Terminals = []
+    NonTerminals = []
+    
+    for i in range(nProductions):
+        line = f.readline()
+        lineRead(line, Terminals, NonTerminals)
 
-                for action in actions:
-                    is_follow(action, actions)
 
-                for action in actions:
-                    print(str(action["rule_key"]) + " => FIRST = {" + str(sorted(action["is_first"]))[1:-1] + "} , FOLLOW = {" + str(action["is_follow"])[1:-1] + "}")
-                    print("\n")
+    printArray(Terminals, True)
+    printArray(NonTerminals, False)
+    
+    f.seek(0)
+    line = f.readline()
+    rules = []
+    for i in range(nProductions):
+        line = f.readline()
+        firstCase(line, Terminals, NonTerminals, rules, i)
 
-                file.close()
+    f.seek(0)
+    line = f.readline()
+    for i in range(nProductions):
+        line = f.readline()
+        firstCase2(line, rules)
+    
 
-                for action in actions:
-                    if action["contains_epsilon"]:
-                        is_ll_1 = False
-                        break
-                    for nt in action["not_first"]:
-                        if get_key_value(actions, nt, "contains_epsilon"):
-                            is_ll_1 = False
-                            break
+    rules[0]["FOLLOW"].append('$')
+    for rule in rules:
+        follow(rule, rules)
+    
+    for rule in rules:
+        print("ruleKey: ", rule["ruleKey"])
+        print("FIRST: ", rule["FIRST"])
+        print("FOLLOW: ", rule["FOLLOW"])
+        print("rules: ", rule["rules"])
+        print("\n")
 
-                if is_ll_1:
-                    print("\nLL(1) YES")
-                else:
-                    print("\nLL(1) NO")
+    LL = True
+    for rule in rules:
+        LL1 = gramaticaLL1(rule, rules) 
+        if not LL1 :
+            LL = False
 
-            except OSError as err:
-                print(Color.FAIL + "!!Mmm creo no existe ese archivo o directorio, vuelve a intentar: {0}".format(
-                    err) + Color.ENDC)
+    if LL:
+        print("Cumple con la primera regla de la gramatica LL(1)")
+    else:
+        print("No cumple con la primera regla de la gramatica LL(1)")
 
-            except ValueError:
-                print("Could not convert data to an integer.")
-            except BaseException as err:
-                print(f"Unexpected {err=}, {type(err)=}")
+    header = '<table border="1" >\n\t<tr>\n\t\t<th>Non-terminals</th>'
+    for t in Terminals:
+        header += '\n\t\t<th>'
+        header += t
+        header += '</th>'
+    
+    header += '\n\t\t<th>$</th>'
 
-        # Finish the program
-        if select == 3:
-            exit()
 
-    except ValueError:
-        print(Color.WARNING + "Creo ingresaste algo que no es un numero, vuelve a intentar" + Color.ENDC)
+    for rule in rules:
+        header += '\n\t<tr>\n\t\t<td>' + rule["ruleKey"] + '</td>'
+        tab = table(rule, rules)
+        for t in Terminals:
+            notFound = True
+            for terInTable in tab['t']:
+                if t == terInTable:
+                    n = tab['t'].index(t)
+                    header += '\n\t\t<td>' + tab["rule"][n] + '</td>'
+                    notFound = False
+            if notFound:
+                header += '\n\t\t<td> </td>'
+        header += '\n\t</tr>'
+    
+    header += '\n\t</tr>\n</table>'
+
+    with open('table.html', 'w') as f:
+        f.write(header)
+
+    f.close()
+
+    res = str(input("\nQuit? \ny - YES \nn - NO\n"))
+    exit = True if res == 'y' else False

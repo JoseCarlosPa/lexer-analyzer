@@ -10,147 +10,123 @@
 ---------------------------------------------------------------------------------------------------------
 """
 
-# Prining color class
-class Color:
-    OKBLUE = '\033[94m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
+# Check if word is in array
+def isIn(word, array):
+    already = True if word in array else False
+    return already
 
-# Menu for the user
-def menu():
-    print('-----Menu-----:')
-    print('1.- LEXER')
-    print('2.- FIRST & FOLLOWS')
-    print('3.- Salir')
+#remove an object from an array
+def removeFromTerminals(word, array):
+    if(word in array):
+        array.remove(word)
+    return array
 
-# Definition of the action rules
-def rules_list(dictionaries, key):
+#Print the arrays
+def printArray(array, isTerminal):
+    string = 'Terminales: ' if isTerminal else 'No Terminales: '
+    for sym in array:
+        string += sym + ', '
+    print(string)
+
+
+# Defines the non-terminals and terminals from a line
+def lineRead(line, t, nt):
+    stack = []
+    right = False
+    # First word will always be a non-terminal expresion
+    for word in line.split():
+        stack.append(word)
+        if (word == '->'):
+            right = True
+            stack.pop()
+            newNonTerminal = stack.pop()
+            if(not isIn(newNonTerminal, nt)):
+                nt.append(newNonTerminal)
+            t = removeFromTerminals(newNonTerminal, t)
+        elif(right and word != "'"):
+            if (not isIn(word, nt) and not isIn(word, t)):
+                t.append(word);
+    return t, nt;
+
+
+
+#Check if the non terminal key is already in dictionary, if not returns a new entry with the key on it
+def isAlreadyKey(dictionaries, key):
     empty = {
-        "rule_key": key,
+        "ruleKey": key,
         "rules": [],
-        "is_first": [],
-        "is_follow": [],
-        "not_first": [],
-        "contains_epsilon": False
+        "FIRST": [],
+        "FOLLOW": [],
+        "ntFIRSTS": [],
+        "hasEpsilon": False
     }
     for dic in dictionaries:
-        if dic["rule_key"] == key:
+        if dic["ruleKey"] == key:
             return dic
     dictionaries.append(empty)
     return empty
 
 
-# Check if the string is in the array
-def is_array(str, array):
-    return True if str in array else False  # Check if a given string is on the array
-
-# Read the next line of the file
-def read_line(line, terminal, no_term):
-    r_side = False
-    pile = []
-    for str in line.split():
-        pile.append(str)
-        if str == '->':  # Split operator for right and left ->
-            r_side = True
-            pile.pop()
-            new_non_terminal = pile.pop()
-            if not is_array(new_non_terminal, no_term):
-                no_term.append(new_non_terminal)
-            terminal = rm_from_terminals(new_non_terminal, terminal)
-        elif r_side and str != "'":  # Not counting case for '
-            if not is_array(str, no_term) and not is_array(str, terminal):
-                terminal.append(str)
-    return terminal, no_term
 
 
-# Remove a string from the terminal array
-def rm_from_terminals(str, array):
-    if str in array:
-        array.remove(str)
-    return array
-
-# Output the array
-def output_array(array, terminal):
-    string = 'Terminal: ' if terminal else 'Non terminal: '
-    for sym in array:
-        string += sym + ', '
-    print(string)
-
-# Function for the lexer analysis
-def read_process():
-    try:
-        filename = input("Ingresa el nombre o el path del archivo:\n")
-
-        file = open(filename, "r")
-
-        product = int(file.readline())
-        terminals = []
-        non_terminals = []
-
-        for _ in range(product):
-            line = file.readline()
-            read_line(line, terminals, non_terminals)
-
-        print('\n')
-        output_array(terminals, True)
-        output_array(non_terminals, False)
-        file.close()
-        print('\n')
-    except OSError as err:
-        print(Color.FAIL + "!!Mmm creo no existe ese archivo o directorio, vuelve a intentar: {0}".format(
-            err) + Color.ENDC)
-
-    except ValueError:
-        print("Could not convert data to an integer.")
-    except BaseException as err:
-        print(f"Unexpected {err=}, {type(err)=}")
+def getValueForKey(rules, key, value):
+    for rule in rules:
+        if rule["ruleKey"] == key:
+            return rule[str(value)]
 
 
-def get_key_value(actions, key, value):
-    for action in actions:
-        if action["rule_key"] == key:
-            return action[str(value)]
 
-def is_first_case(index, content, terminals, actions):
-    is_first = True
-    content = content.split()
-    action = rules_list(actions, content[0])
-    del content[:2]
+#Check for the first rule of epsilon  X -> a, a is a terminal
+def firstCase(line, terminals, nonTerminals, rules, index):
+
+    line = line.split()
+    rule = isAlreadyKey(rules, line[0])
+    del line[:2]
+    first = True
     body = {
         "index": index,
-        "rule": content,
+        "rule": line,
     }
-    action["rules"].append(body)
-    for element in content:
-        if element != '->':
-            if is_first:
-                if is_array(element, terminals):
-                    if not is_array(element, action["is_first"]):
-                        action["is_first"].append(element)
-                        return action
+    rule["rules"].append(body)
+    for element in line:
+        if (element != '->'):
+            if (first):
+                if(isIn(element, terminals)):
+                    if(not isIn(element, rule["FIRST"])):
+                        rule["FIRST"].append(element)
+                        return rule
+                elif (element == "'"):
+                    rule["hasEpsilon"] = True
+                    rule["FIRST"].append('€')
+                    return
                 else:
-                    if not is_array(element, action["is_first"]):
-                        action["is_first"].append(element)
-                        return action
-            elif element == "'":
-                action["contains_epsilon"] = True
+                    if(not isIn(element, rule["FIRST"])):
+                        rule["FIRST"].append(element)
+                        return rule
+            elif (element == "'"):
+                rule["hasEpsilon"] = True
             else:
-                if not is_array(element, action["not_first"]):
-                    action["not_first"].append(element)
-            is_first = False
+                if(not isIn(element, rule["ntFIRSTS"])):
+                    rule["ntFIRSTS"].append(element)
+            first = False
 
-    return action
-
-
-
-def not_terminal_is_first(not_terminal, actions):
-    for action in actions:
-        if action["rule_key"] == not_terminal:
-            if len(action["is_first"]) > 0:
-                return action["is_first"]
-            elif len(action["not_first"]) > 0:
-                for ntF in action["not_first"]:
-                    return not_terminal_is_first(ntF, actions)
+    return rule
 
 
+#Check for the first of nt symbols
+def firstNTR(nt, rules):
+    for rule in rules:
+        if(rule["ruleKey"] == nt):
+            if(len(rule["FIRST"]) > 0):
+                return rule["FIRST"]
+            elif(len(rule["ntFIRSTS"]) > 0):
+                for ntF in rule["ntFIRSTS"]:
+                        return firstNTR(ntF, rules)
+
+def getFirstOf(rules, element,Terminals):
+    if isIn(element, Terminals):
+        return element
+    elif element == "'":
+        return []
+    else:
+        return getValueForKey(rules, element, "FIRST")
