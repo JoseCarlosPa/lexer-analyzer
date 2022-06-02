@@ -53,52 +53,37 @@ chmod 777 setup.sh
 ```
 
 - Una vez que termine de instalarse se ejecutara de forma inmediatamente el programa "main.py" el cual corresponde al proyecto, podras ver en tu terminal algo parecido:
-<div align="center">
-    <img src="images/screenshot-1.png" alt="Logo" width="40%" height="40%">
-</div>
-<p align="right">(<a href="#top">back to top</a>)</p>
 
 
 ### Usándolo
 
-- El menu consta de 2 secciones y podran ser elegidos unicamente con los numeros 1,2 o 3:
-  <ol>
-    <li>Lexer</li>
-    <li>First & Follows</li>
-    <li>Salir</li>
-  </ol>
-- En la primera opción correspondiente al número "1" podras obtener un analisis lexico al leer el contenido de un archivo especificando su nombre o el path del archivo incluyendo su extension (.txt), veras una pantalla parecida a esta:
+- De forma imediata el programa te pedira que ingrese el nombre de un archivo por lo que veras en tu terminal algo parecido:
 <div align="center">
-    [Pantalla de menu para ingresar nombre de archivo]
+    <img src="images/screenshot-1.png" alt="Logo" width="70%" height="40%">
 </div>
-<div align="center">
-    <img src="images/screenshot-2.png" alt="Logo" width="40%" height="40%">
-</div>
+<p align="right">(<a href="#top">back to top</a>)</p>
 
-<div align="center">
-    [Pantalla con el resultado del analizador lexico en consola ]
-</div>
-<div align="center">
-    <img src="images/screenshot-3.png" alt="Logo" width="40%" height="40%">
-</div>
-
->Nota: Si se desea puedes copiar y pegar tu archivo al mismo nivel que el archivo main.py para solo escribir el nombre del archivo
-- En la opcion correspondiente al número "2" podras obtener los First y Follows de un archivo de la misma forma deberas ingresar nombre o path del archivo con su extension (.txt)
-<div align="center">
-    [Pantalla del menu para ingresar nombre de archivo]
-
-</div>
-<div align="center">
-    <img src="images/screenshot-4.png" alt="Logo" width="40%" height="40%">
-</div>
-
-<div align="center">
-    <img src="images/screenshot-5.png" alt="Logo" width="40%" height="40%">
-</div>
-    [Pantalla del resultado de first y follows en consola ]
+- Deberas ingresar el nombre del archivo o en su defecto usar los test cases ubicados en ./test_Cases/
 
 
->Nota: Si se desea puedes copiar y pegar tu archivo al mismo nivel que el archivo main.py para solo escribir el nombre del archivo
+>Nota: Si asi lo deseas puedes poner los archivos al nivel del main o en su defecto en la carpeta de test_cases
+
+- Ejemplo de entrada:
+<div align="center">
+    <img src="images/screenshot-2.png" alt="Logo" width="70%" height="40%">
+</div>
+
+- El resultado sera parecido al siguiente:
+<div align="center">
+    <img src="images/screenshot-3.png" alt="Logo" width="70%" height="40%">
+</div>
+
+>Nota: El archivo de HTML lo podras encontrar en la carpeta de test_cases con el nombre: fecha_hoy-Table.html
+
+- Ejemplo de la tabla:
+<div align="center">
+    <img src="images/screenshot-4.png" alt="Logo" width="70%" height="40%">
+</div>
 
 
 <!-- MARKDOWN LINKS & IMAGES -->
