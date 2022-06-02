@@ -13,7 +13,7 @@
     <img src="images/logo.svg" alt="Logo" width="350" height="350">
   </a>
   <h3 align="center">First and Follow</h3>
-  <p align="center">Proyecto de Compiladores Parte 2</p>
+  <p align="center">Proyecto de Compiladores Parte 3</p>
 <p>Jose Carlos Pacheco Sanchez - A01702828</p>
 </div>
 
