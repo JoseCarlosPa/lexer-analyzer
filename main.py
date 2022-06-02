@@ -12,7 +12,6 @@
 
 from functions import *
 from datetime import date
-import os
 
 while True:
     try:
@@ -23,8 +22,6 @@ while True:
         n_productions = int(n[0])
 
         n_chains = int(n[1])
-
-
 
         terminals = []
         non_terminals = []

@@ -83,7 +83,7 @@ def get_key(rules, key, value):
             return rule[str(value)]
 
 
-# Check for the first rule of epsilon  X -> a is a terminal
+# Check for the first rule of epsilon  X -> A is a terminal
 def get_if_first_terminal(line, terminals, non_terminals, rules, index):
     line = line.split()
     rule = set_key(rules, line[0])
@@ -131,8 +131,8 @@ def is_first_non_terminal(nt, rules):
 
 
 # Get the first of rules and return with terminals
-def get_first_of(rules, element, Terminals):
-    if is_in_array(element, Terminals):
+def get_first_of(rules, element, terminals):
+    if is_in_array(element, terminals):
         return element
     elif element == "'":
         return []
@@ -141,12 +141,12 @@ def get_first_of(rules, element, Terminals):
 
 
 # Check for the first if its terminal
-def is_first_terminal(line, rules, Terminals):
+def is_first_terminal(line, rules, terminals):
     has_epsilon = True
     for rule in rules:
         if len(rule["FIRST"]) > 0:
             for t in rule["FIRST"]:
-                if not is_in_array(t, Terminals) and t != '€':
+                if not is_in_array(t, terminals) and t != '€':
                     rule['FIRST'] = list(set(rule['FIRST']) | set(is_first_non_terminal(t, rules)))
                     rule['FIRST'].remove(t)
         if len(rule["FIRST"]) <= 0:
@@ -159,7 +159,7 @@ def is_first_terminal(line, rules, Terminals):
 
 
 # Get the follow on the terminals
-def get_follow(rule, rules, Terminals):
+def get_follow(rule, rules, terminals):
     rule_ley = rule["ruleKey"]
     for allRule in rules:
         for number_rules in allRule["rules"]:
@@ -169,26 +169,26 @@ def get_follow(rule, rules, Terminals):
                     follow = allRule["FOLLOW"]
                     rule["FOLLOW"] = list(set(rule['FOLLOW']) | set(follow))
                 elif index < len(number_rules["rule"]):
-                    next = get_first_of(rules, number_rules["rule"][index], Terminals)
-                    if is_in_array("€", next):
-                        follow = list(set(rule['FOLLOW']) | set(next))
-                        next = list(set(allRule["FOLLOW"]) | set(follow))
-                        rule["FOLLOW"] = next
+                    next_ln = get_first_of(rules, number_rules["rule"][index], terminals)
+                    if is_in_array("€", next_ln):
+                        follow = list(set(rule['FOLLOW']) | set(next_ln))
+                        next_ln = list(set(allRule["FOLLOW"]) | set(follow))
+                        rule["FOLLOW"] = next_ln
                         if '€' in rule["FOLLOW"]:
                             rule["FOLLOW"].remove('€')
                     else:
-                        rule["FOLLOW"] = list(set(rule['FOLLOW']) | set(next))
+                        rule["FOLLOW"] = list(set(rule['FOLLOW']) | set(next_ln))
                         if '€' in rule["FOLLOW"]:
                             rule["FOLLOW"].remove('€')
 
 
 # Check if the grammatic has LL1
-def get_grammatical_ll1(rule, rules, Terminals):
+def get_grammatical_ll1(rule, rules, terminals):
     firsts = []
     for r in rule["rules"]:
         first = r["rule"][0]
         right_first = []
-        right_first = get_first_of(rules, first, Terminals)
+        right_first = get_first_of(rules, first, terminals)
         for i in right_first:
             if not is_in_array(i, firsts):
                 firsts.append(i)
