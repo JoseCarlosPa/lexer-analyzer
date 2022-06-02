@@ -11,6 +11,14 @@
 """
 
 
+class Color:
+    OKBLUE = '\033[94m'
+    GREEN = '\033[0;32m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+
+
 # Check if word is in array
 def is_in_array(word, array):
     already = True if word in array else False
@@ -18,14 +26,14 @@ def is_in_array(word, array):
 
 
 # Remove an object from an array
-def del_from_terminals(word, array):
-    if word in array:
-        array.remove(word)
+def del_from_terminals(w_str, array):
+    if w_str in array:
+        array.remove(w_str)
     return array
 
 
 # Print the arrays
-def get_array(array, is_terminal):
+def output_array(array, is_terminal):
     string = 'Terminales: ' if is_terminal else 'No Terminales: '
     for sym in array:
         string += sym + ', '
@@ -33,23 +41,22 @@ def get_array(array, is_terminal):
 
 
 # Defines the non-terminals and terminals from a line
-def next_line_read(line, t, nt):
-    stack = []
-    right = False
-    # First word will always be a non-terminal expresion
+def next_line_read(line, terminal, non_terminals):
+    r_side = False
+    pile = []
     for word in line.split():
-        stack.append(word)
+        pile.append(word)
         if word == '->':
-            right = True
-            stack.pop()
-            newNonTerminal = stack.pop()
-            if not is_in_array(newNonTerminal, nt):
-                nt.append(newNonTerminal)
-            t = del_from_terminals(newNonTerminal, t)
-        elif right and word != "'":
-            if not is_in_array(word, nt) and not is_in_array(word, t):
-                t.append(word);
-    return t, nt;
+            r_side = True
+            pile.pop()
+            new_non_terminal = pile.pop()
+            if not is_in_array(new_non_terminal, non_terminals):
+                non_terminals.append(new_non_terminal)
+            terminal = del_from_terminals(new_non_terminal, terminal)
+        elif r_side and word != "'":
+            if not is_in_array(word, non_terminals) and not is_in_array(word, terminal):
+                terminal.append(word)
+    return terminal, non_terminals
 
 
 # Check if the non-terminal key is already in dictionary, if not returns a new entry with the key on it
@@ -62,9 +69,9 @@ def set_key(dictionaries, key):
         "ntFIRSTS": [],
         "hasEpsilon": False
     }
-    for dic in dictionaries:
-        if dic["ruleKey"] == key:
-            return dic
+    for dictionary in dictionaries:
+        if dictionary["ruleKey"] == key:
+            return dictionary
     dictionaries.append(empty)
     return empty
 
@@ -78,7 +85,6 @@ def get_key(rules, key, value):
 
 # Check for the first rule of epsilon  X -> a is a terminal
 def get_if_first_terminal(line, terminals, non_terminals, rules, index):
-
     line = line.split()
     rule = set_key(rules, line[0])
     del line[:2]
@@ -121,11 +127,11 @@ def is_first_non_terminal(nt, rules):
                 return rule["FIRST"]
             elif len(rule["ntFIRSTS"]) > 0:
                 for ntF in rule["ntFIRSTS"]:
-                        return is_first_non_terminal(ntF, rules)
+                    return is_first_non_terminal(ntF, rules)
 
 
 # Get the first of rules and return with terminals
-def get_first_of(rules, element,Terminals):
+def get_first_of(rules, element, Terminals):
     if is_in_array(element, Terminals):
         return element
     elif element == "'":
@@ -135,81 +141,83 @@ def get_first_of(rules, element,Terminals):
 
 
 # Check for the first if its terminal
-def is_first_terminal(line, rules,Terminals):
-    hasEpsilon = True
+def is_first_terminal(line, rules, Terminals):
+    has_epsilon = True
     for rule in rules:
         if len(rule["FIRST"]) > 0:
             for t in rule["FIRST"]:
-                    if not is_in_array(t, Terminals) and t != '€':
-                        rule['FIRST'] = list(set(rule['FIRST']) | set(is_first_non_terminal(t, rules)))
-                        rule['FIRST'].remove(t)
+                if not is_in_array(t, Terminals) and t != '€':
+                    rule['FIRST'] = list(set(rule['FIRST']) | set(is_first_non_terminal(t, rules)))
+                    rule['FIRST'].remove(t)
         if len(rule["FIRST"]) <= 0:
             for nt in rule["ntFIRSTS"]:
-                    if hasEpsilon:
-                        rule['FIRST'] = list(set(rule['FIRST']) | set(is_first_non_terminal(nt, rules)))
-                        hasEpsilon = get_key(rules, nt, "hasEpsilon")
-                    else:
-                         return
+                if has_epsilon:
+                    rule['FIRST'] = list(set(rule['FIRST']) | set(is_first_non_terminal(nt, rules)))
+                    has_epsilon = get_key(rules, nt, "hasEpsilon")
+                else:
+                    return
 
 
 # Get the follow on the terminals
-def get_follow(rule, rules,Terminals):
-    ruleKey = rule["ruleKey"]
+def get_follow(rule, rules, Terminals):
+    rule_ley = rule["ruleKey"]
     for allRule in rules:
-        for nRule in allRule["rules"]:
-            if is_in_array(ruleKey, nRule["rule"]):
-                index = nRule["rule"].index(ruleKey) + 1
-                if index == len(nRule["rule"]) :
+        for number_rules in allRule["rules"]:
+            if is_in_array(rule_ley, number_rules["rule"]):
+                index = number_rules["rule"].index(rule_ley) + 1
+                if index == len(number_rules["rule"]):
                     follow = allRule["FOLLOW"]
                     rule["FOLLOW"] = list(set(rule['FOLLOW']) | set(follow))
-                elif index < len(nRule["rule"]) :
-                    firstNext = get_first_of(rules, nRule["rule"][index],Terminals)
-                    if is_in_array("€", firstNext):
-                        follow = list(set(rule['FOLLOW']) | set(firstNext))
-                        firstNext =  list(set(allRule["FOLLOW"]) | set(follow))
-                        rule["FOLLOW"] = firstNext
-                        if '€' in rule["FOLLOW"]: rule["FOLLOW"].remove('€')
+                elif index < len(number_rules["rule"]):
+                    next = get_first_of(rules, number_rules["rule"][index], Terminals)
+                    if is_in_array("€", next):
+                        follow = list(set(rule['FOLLOW']) | set(next))
+                        next = list(set(allRule["FOLLOW"]) | set(follow))
+                        rule["FOLLOW"] = next
+                        if '€' in rule["FOLLOW"]:
+                            rule["FOLLOW"].remove('€')
                     else:
-                        rule["FOLLOW"] = list(set(rule['FOLLOW']) | set(firstNext))
-                        if '€' in rule["FOLLOW"]: rule["FOLLOW"].remove('€')
+                        rule["FOLLOW"] = list(set(rule['FOLLOW']) | set(next))
+                        if '€' in rule["FOLLOW"]:
+                            rule["FOLLOW"].remove('€')
 
 
 # Check if the grammatic has LL1
-def get_grammatical_ll1(rule, rules,Terminals):
+def get_grammatical_ll1(rule, rules, Terminals):
     firsts = []
     for r in rule["rules"]:
         first = r["rule"][0]
-        rfirsts = []
-        rfirsts = get_first_of(rules, first,Terminals)
-        for e in rfirsts:
-            if not is_in_array(e, firsts):
-                firsts.append(e)
+        right_first = []
+        right_first = get_first_of(rules, first, Terminals)
+        for i in right_first:
+            if not is_in_array(i, firsts):
+                firsts.append(i)
             else:
                 return False
     return True
 
 
-def print_html(r, rules,non_terminals):
+def print_html(r, rules, non_terminals):
     row = {
         "rule": [],
         "nt": [],
         "t": []
     }
     for first in r["FIRST"]:
-        notFound = True
-        for keyRule in r["rules"]:
-            for charInKeyRule in keyRule["rule"]:
+        not_found = True
+        for rule_key in r["rules"]:
+            for charInKeyRule in rule_key["rule"]:
                 if charInKeyRule == first:
-                    row['nt'].append(r["ruleKey"]) # r is the original ruleKey
-                    row['t'].append(first) # is part of the firsts of r
-                    ntAppend = r["ruleKey"] +' -> '+''.join(keyRule["rule"])
-                    row['rule'].append(ntAppend)
-                    notFound = False
-        #the first is not contained directly in the rules of the the key r
-        if notFound:
-            for keyRule in r["rules"]:
-                for charInKeyRule in keyRule["rule"]:
-                    if(is_in_array(charInKeyRule, non_terminals)):
+                    row['nt'].append(r["ruleKey"])  # r is the original ruleKey
+                    row['t'].append(first)  # is part of the firsts of r
+                    not_append = r["ruleKey"] + ' -> ' + ''.join(rule_key["rule"])
+                    row['rule'].append(not_append)
+                    not_found = False
+        # the first is not contained directly in the rules of the the key r
+        if not_found:
+            for rule_key in r["rules"]:
+                for charInKeyRule in rule_key["rule"]:
+                    if is_in_array(charInKeyRule, non_terminals):
                         for rule in rules:
                             if rule["ruleKey"] == charInKeyRule:
                                 for nonTerminalRules in rule["rules"]:
@@ -217,12 +225,12 @@ def print_html(r, rules,non_terminals):
                                         if charInRule == first:
                                             row['nt'].append(r["ruleKey"])
                                             row['t'].append(first)
-                                            ntAppend = r["ruleKey"] +' -> '+''.join(keyRule["rule"])
-                                            row['rule'].append(ntAppend)
-                                            notFound = False
-        if notFound:
-            for keyRule in r["rules"]:
-                for charInKeyRule in keyRule["rule"]:
+                                            not_append = r["ruleKey"] + ' -> ' + ''.join(rule_key["rule"])
+                                            row['rule'].append(not_append)
+                                            not_found = False
+        if not_found:
+            for rule_key in r["rules"]:
+                for charInKeyRule in rule_key["rule"]:
                     if is_in_array(charInKeyRule, non_terminals):
                         for nonTerminal in rules:
                             if nonTerminal["ruleKey"] == charInKeyRule:
@@ -236,8 +244,8 @@ def print_html(r, rules,non_terminals):
                                                             if NTRule == first:
                                                                 row['nt'].append(r["ruleKey"])
                                                                 row['t'].append(first)
-                                                                ntAppend = r["ruleKey"] +' -> '+''.join(keyRule["rule"])
-                                                                row['rule'].append(ntAppend)
-                                                                notFound = False
+                                                                not_append = r["ruleKey"] + ' -> ' + ''.join(
+                                                                    rule_key["rule"])
+                                                                row['rule'].append(not_append)
+                                                                not_found = False
     return row
-
