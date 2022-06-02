@@ -12,6 +12,7 @@
 
 from functions import *
 from datetime import date
+import random
 
 while True:
     try:
@@ -65,8 +66,9 @@ while True:
                 LL = False
 
         if LL:
-            print(Color.GREEN + "Cumple con la primera regla de la gramatica LL(1)" +  Color.ENDC)
-            print(Color.WARNING + "La tabla la podras ver en" + Color.ENDC + Color.OKBLUE + "/test_cases/fecha_de_hoy-Table.html" + Color.ENDC)
+            print(Color.GREEN + "Cumple con la primera regla de la gramatica LL(1)" + Color.ENDC)
+            print(
+                Color.WARNING + "La tabla la podras ver en" + Color.ENDC + Color.OKBLUE + "/test_cases/fecha_de_hoy-Table.html" + Color.ENDC)
         else:
             print(Color.FAIL + "No cumple con la primera regla de la gramatica LL(1)" + Color.ENDC)
             quit()
@@ -95,16 +97,19 @@ while True:
         header += '\n\t</tr>\n</table>'
 
         count = 1
-        for rule in rules:
-            header += '\n<p><strong>Input#:' + str(count) + '</strong>' + str(rule["rules"]) + '</p>'
+        for i in range(0, n_chains):
+            line = file.readline()
+            header += '\n<p><strong>Input#:' + str(count) + '</strong>' + str(line) + '  Accepeted - </p>'
             count = count + 1
 
         today = date.today()
 
-        with open('test_cases/Table-' + str(today) + '.html', 'w') as file:
+        with open('test_cases/Table-' + str(random.randrange(100)) + '-' + str(today) + '.html', 'w') as file:
             file.write(header)
 
         file.close()
+
+
 
     except OSError as err:
         print(Color.FAIL + "!!Mmm creo no existe ese archivo o directorio, vuelve a intentar: {0}".format(
