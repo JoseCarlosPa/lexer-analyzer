@@ -99,7 +99,7 @@ while True:
         count = 1
         for i in range(0, n_chains):
             line = file.readline()
-            header += '\n<p><strong>Input#: ' + str(count) + '</strong>' + str(line) + '  Accepeted - </p>'
+            header += '\n<p><strong>Input# ' + str(count) + '</strong> ' + str(line) + '  Accepeted - </p>'
             count = count + 1
 
         today = date.today()
@@ -108,7 +108,6 @@ while True:
             file.write(header)
 
         file.close()
-
 
 
     except OSError as err:
