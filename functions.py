@@ -3,9 +3,9 @@
 *
 *       Jose Carlos Pacheco Sanchez - A01702828
 *       Compiladores - Feb-Jun 2022 - Qro
-*       Name: Generador de is_first & is_follows
+*       Name: LL Table generator
 *       Based on: https://github.com/Manchas2k4/compilers/tree/master/examples/lexical_analyzer
-*       File: Functions and methods files
+*       File: Functions and methods files part 3
 *
 ---------------------------------------------------------------------------------------------------------
 """
@@ -95,7 +95,7 @@ def get_if_first_terminal(line, terminals, non_terminals, rules, index):
     }
     rule["rules"].append(body)
     for element in line:
-        if element != '->':
+        if element != '->': # Check for roght side of the cchains
             if first:
                 if is_in_array(element, terminals):
                     if not is_in_array(element, rule["FIRST"]):
@@ -149,6 +149,7 @@ def is_first_terminal(line, rules, terminals):
                 if not is_in_array(t, terminals) and t != '€':
                     rule['FIRST'] = list(set(rule['FIRST']) | set(is_first_non_terminal(t, rules)))
                     rule['FIRST'].remove(t)
+        # Check the array length
         if len(rule["FIRST"]) <= 0:
             for nt in rule["ntFIRSTS"]:
                 if has_epsilon:
@@ -174,6 +175,7 @@ def get_follow(rule, rules, terminals):
                         follow = list(set(rule['FOLLOW']) | set(next_ln))
                         next_ln = list(set(allRule["FOLLOW"]) | set(follow))
                         rule["FOLLOW"] = next_ln
+                        # Get the Epsilons
                         if '€' in rule["FOLLOW"]:
                             rule["FOLLOW"].remove('€')
                     else:
@@ -197,6 +199,7 @@ def get_grammatical_ll1(rule, rules, terminals):
     return True
 
 
+# Function to print the html table with al the rules and parsers
 def print_html(r, rules, non_terminals):
     row = {
         "rule": [],
@@ -208,13 +211,13 @@ def print_html(r, rules, non_terminals):
         for rule_key in r["rules"]:
             for charInKeyRule in rule_key["rule"]:
                 if charInKeyRule == first:
-                    row['nt'].append(r["ruleKey"])  # r is the original ruleKey
-                    row['t'].append(first)  # is part of the firsts of r
+                    row['nt'].append(r["ruleKey"])
+                    row['t'].append(first)
                     not_append = r["ruleKey"] + ' -> ' + ''.join(rule_key["rule"])
                     row['rule'].append(not_append)
                     not_found = False
-        # the first is not contained directly in the rules of the the key r
-        if not_found:
+
+        if not_found: # Sames as below but with no terminals rules
             for rule_key in r["rules"]:
                 for charInKeyRule in rule_key["rule"]:
                     if is_in_array(charInKeyRule, non_terminals):
@@ -228,7 +231,7 @@ def print_html(r, rules, non_terminals):
                                             not_append = r["ruleKey"] + ' -> ' + ''.join(rule_key["rule"])
                                             row['rule'].append(not_append)
                                             not_found = False
-        if not_found:
+        if not_found: # Sames as up but with terminal and founders
             for rule_key in r["rules"]:
                 for charInKeyRule in rule_key["rule"]:
                     if is_in_array(charInKeyRule, non_terminals):

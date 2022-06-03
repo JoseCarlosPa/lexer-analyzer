@@ -3,7 +3,7 @@
 *
 *       Jose Carlos Pacheco Sanchez - A01702828
 *       Compiladores - Feb-Jun 2022 - Qro
-*       Name: Generador de is_first & is_follows
+*       Name: LL Table generator
 *       Based on: https://github.com/Manchas2k4/compilers/tree/master/examples/lexical_analyzer
 *       File: Main component part 3
 *
